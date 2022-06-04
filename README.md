@@ -83,9 +83,19 @@ main.button({
  配置             | 类型       | 说明
  ---             | ---        | ---
  option.position | `String`   | 按钮的位置。允许在以下位置：<br>`center` - 按钮在圆心处，只能定义一个<br>`ring` - 按钮在圆环处，能定义多个<br>`top` - 按钮在上栏，能定义多个 <br>`bottom` - 按钮在下栏，能定义多个
- option.label    | `String`   | 按钮的标签文本
+ option.label    | `String` / `Function`   | 按钮的标签文本, 也可以通过函数返回值确定
  option.key      | `String`   | 按钮的快捷键
  option.render   | `Function` | 按钮的渲染器，如果指定，将使用指定的渲染器。如果不指定，将渲染标签。<br>渲染器需要返回按钮的 HTML 代码。
  option.enable   | `Function` | 按钮是否可用的查询函数，如果不指定，则按钮始终可用。函数需要返回一个 `bool` 类型的值，来决定按钮是否可用。
  option.action   | `Function` | 按钮执行的操作
  option.next     | `string`   | 操作执行之后热盒到达的状态。如不指定，默认到达 `idle`。可使用该参数来跳转到多级热盒。可以取值为 `back`
+
+### 下次激活时重新渲染button `rerender()`
+
+使用 `rerender()` 方法为使得该状态在下次激活时重新渲染button。
+
+```js
+var main = hotbox.state('main');
+main.rerender();
+hotbox.active('main', {x: 400, y: 400});
+```

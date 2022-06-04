@@ -1,4 +1,4 @@
-define(function(require, exports, module) {
+define(function (require, exports, module) {
     var key = require('./key');
     var KeyControl = require('./keycontrol');
 
@@ -35,10 +35,10 @@ define(function(require, exports, module) {
      * Simple Formatter
      */
     function format(template, args) {
-        if (typeof(args) != 'object') {
+        if (typeof (args) != 'object') {
             args = [].slice.apply(arguments, 1);
         }
-        return String(template).replace(/\{(\w+)\}/g, function(match, name) {
+        return String(template).replace(/\{(\w+)\}/g, function (match, name) {
             return args[name] || match;
         });
     }
@@ -47,7 +47,7 @@ define(function(require, exports, module) {
      * Hot Box Class
      */
     function HotBox($container) {
-        if (typeof($container) == 'string') {
+        if (typeof ($container) == 'string') {
             $container = document.querySelector($container);
         }
         if (!$container || !($container instanceof HTMLElement)) {
@@ -119,7 +119,7 @@ define(function(require, exports, module) {
             _controler = new Controller(_this);
             _controler.active();
 
-            $hotBox.onmousedown = function(e) {
+            $hotBox.onmousedown = function (e) {
                 e.stopPropagation();
                 e.preventDefault();
             };
@@ -130,10 +130,10 @@ define(function(require, exports, module) {
         function _dispatchKey(e) {
             var type = e.type.toLowerCase();
             e.keyHash = key.hash(e);
-            e.isKey = function(keyExpression) {
+            e.isKey = function (keyExpression) {
                 if (!keyExpression) return false;
                 var expressions = keyExpression.split(/\s*\|\s*/);
-                while(expressions.length) {
+                while (expressions.length) {
                     if (e.keyHash == key.hash(expressions.shift())) return true;
                 }
                 return false;
@@ -150,7 +150,7 @@ define(function(require, exports, module) {
             var handleState = _currentState == IDLE ? _mainState : _currentState;
             if (handleState) {
                 var handleResult = handleState.handleKeyEvent(e);
-                if (typeof(_this.onkeyevent) == 'function') {
+                if (typeof (_this.onkeyevent) == 'function') {
                     e.handleResult = handleResult;
                     _this.onkeyevent(e, handleResult);
                 }
@@ -202,7 +202,7 @@ define(function(require, exports, module) {
                 }
                 var newState = _states[name];
                 _stateStack.unshift(newState);
-                if (typeof(_this.position) == 'function') {
+                if (typeof (_this.position) == 'function') {
                     position = _this.position(position);
                 }
                 newState.active(position);
@@ -283,6 +283,11 @@ define(function(require, exports, module) {
         // 布局，添加按钮后，标记需要布局
         var needLayout = true;
 
+        var rerender = false
+        this.rerender = function () {
+            rerender = true
+        }
+
         function layout() {
             var radius = buttons.ring.length * 15;
             layoutRing(radius);
@@ -319,7 +324,7 @@ define(function(require, exports, module) {
                 var yOffset = -radius * 2 - $top.clientHeight / 2;
                 $top.style.marginLeft = xOffset + 'px';
                 $top.style.marginTop = yOffset + 'px';
-                buttons.top.forEach(function(topButton) {
+                buttons.top.forEach(function (topButton) {
                     var $button = topButton.$button;
                     topButton.indexedPosition = [xOffset + $button.offsetLeft + $button.clientWidth / 2, yOffset];
                 });
@@ -329,13 +334,13 @@ define(function(require, exports, module) {
                 var yOffset = radius * 2 - $bottom.clientHeight / 2;
                 $bottom.style.marginLeft = xOffset + 'px';
                 $bottom.style.marginTop = yOffset + 'px';
-                buttons.bottom.forEach(function(bottomButton) {
+                buttons.bottom.forEach(function (bottomButton) {
                     var $button = bottomButton.$button;
                     bottomButton.indexedPosition = [xOffset + $button.offsetLeft + $button.clientWidth / 2, yOffset];
                 });
             }
             function indexPosition() {
-                var positionedButtons = allButtons.filter(function(button) {
+                var positionedButtons = allButtons.filter(function (button) {
                     return button.indexedPosition;
                 });
 
@@ -350,7 +355,7 @@ define(function(require, exports, module) {
                     var possible, dir;
                     var abs = Math.abs;
 
-                    positionedButtons.forEach(function(candidate) {
+                    positionedButtons.forEach(function (candidate) {
                         if (button == candidate) return;
 
                         candidatePosition = candidate.indexedPosition;
@@ -404,6 +409,7 @@ define(function(require, exports, module) {
             }
 
             return {
+                render: option.render,
                 action: option.action,
                 enable: option.enable || alwaysEnable,
                 beforeShow: option.beforeShow,
@@ -418,13 +424,13 @@ define(function(require, exports, module) {
         // 默认按钮渲染
         function defaultButtonRender(format, option) {
             return format('<span class="label">{label}</span><span class="key">{key}</span>', {
-                label: option.label,
+                label: typeof option.label === 'function' ? option.label() : option.label,
                 key: option.key && option.key.split('|')[0]
             });
         }
 
         // 为当前状态添加按钮
-        this.button = function(option) {
+        this.button = function (option) {
             var button = createButton(option);
             if (option.position == 'center') {
                 buttons.center = button;
@@ -444,16 +450,22 @@ define(function(require, exports, module) {
                 $state.style.left = position.x + 'px';
                 $state.style.top = position.y + 'px';
             }
-            allButtons.forEach(function(button) {
+            allButtons.forEach(function (button) {
                 var $button = button.$button;
                 if ($button) {
                     $button.classList[button.enable() ? 'add' : 'remove']('enabled');
+                }
+
+                if (rerender) {
+                    var render = button.render || defaultButtonRender;
+                    $button.innerHTML = render(format, { label: button.label, key: button.key });
                 }
 
                 if (button.beforeShow) {
                     button.beforeShow();
                 }
             });
+            rerender = false
             addElementClass($state, STATE_ACTIVE_CLASS);
             if (needLayout) {
                 layout();
@@ -498,12 +510,12 @@ define(function(require, exports, module) {
             }
         }
 
-        $state.onmouseup = function(e) {
+        $state.onmouseup = function (e) {
             if (e.button) return;
             var target = e.target;
             while (target && target != $state) {
                 if (target.classList.contains('button')) {
-                    allButtons.forEach(function(button) {
+                    allButtons.forEach(function (button) {
                         if (button.$button == target) {
                             execute(button);
                         }
@@ -513,7 +525,7 @@ define(function(require, exports, module) {
             }
         };
 
-        this.handleKeyEvent = function(e) {
+        this.handleKeyEvent = function (e) {
             var handleResult = null;
             /**
              * @Desc: 搜狗浏览器下esc只触发keyup，因此做兼容性处理
@@ -533,7 +545,7 @@ define(function(require, exports, module) {
                 };
             };
             if (e.keydown || (hotBox.isIME && e.keyup)) {
-                allButtons.forEach(function(button) {
+                allButtons.forEach(function (button) {
                     if (button.enable() && e.isKey(button.key)) {
                         if (stateActived || hotBox.hintDeactiveMainState) {
                             select(button);
@@ -541,7 +553,7 @@ define(function(require, exports, module) {
                             handleResult = 'buttonpress';
 
                             // 如果是 keyup 事件触发的，因为没有后续的按键事件，所以就直接执行
-                            if(e.keyup) {
+                            if (e.keyup) {
                                 execute(button);
                                 handleResult = 'execute';
                                 return handleResult;
@@ -568,7 +580,7 @@ define(function(require, exports, module) {
                         }
                         return 'back';
                     }
-                    ['up', 'down', 'left', 'right'].forEach(function(dir) {
+                    ['up', 'down', 'left', 'right'].forEach(function (dir) {
                         if (!e.isKey(dir)) return;
                         if (!selectedButton) {
                             select(buttons.center || buttons.ring[0] || buttons.top[0] || buttons.bottom[0]);
