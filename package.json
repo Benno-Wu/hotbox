@@ -45,6 +45,7 @@
     "watch-less": "watch \"lessc --source-map less/hotbox.less hotbox.css\" \"less\""
   },
   "publishConfig": {
+    "access": "public",
     "registry": "https://registry.npmjs.org/"
   }
 }
