@@ -1,17 +1,19 @@
 {
-  "name": "hotbox",
+  "name": "@bennowu/hotbox",
   "title": "Hot Box UI",
   "description": "Efficiency And Flexible Editor UI",
-  "version": "1.0.15",
-  "homepage": "https://github.com/fex-team/hotbox",
-  "author": {
-    "name": "Baidu FEX",
-    "url": "https://github.com/fex-team"
-  },
+  "version": "1.1.15",
+  "homepage": "https://github.com/Benno-Wu/hotbox",
+  "author": "BennoWu",
   "repository": {
     "type": "git",
-    "url": "https://github.com/fex-team/hotbox.git"
+    "url": "https://github.com/Benno-Wu/hotbox.git"
   },
+  "files": [
+    "hotbox.css",
+    "hotbox.js",
+    "hotbox.min.js"
+  ],
   "keywords": [
     "ui",
     "hotbox",
@@ -21,15 +23,9 @@
     "library"
   ],
   "bugs": {
-    "url": "https://github.com/fex-team/hotbox/issues"
+    "url": "https://github.com/Benno-Wu/hotbox/issues"
   },
-  "main": "src/mog.js",
-  "licenses": [
-    {
-      "type": "BSD",
-      "url": "https://github.com/fex-team/hotbox/blob/dev/LICENSE"
-    }
-  ],
+  "license": "MIT",
   "dependencies": {},
   "devDependencies": {
     "grunt": "^0.4.5",
@@ -44,6 +40,11 @@
     "watch": "~0.13.0"
   },
   "scripts": {
+    "build": "grunt build",
+    "prepublishOnly": "npm run build",
     "watch-less": "watch \"lessc --source-map less/hotbox.less hotbox.css\" \"less\""
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
   }
 }

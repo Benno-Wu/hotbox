@@ -1,5 +1,13 @@
 /*!
  * ====================================================
+ * @bennowu/hotbox - v1.1.15 - 2022-06-05
+ * GitHub: https://github.com/Benno-Wu/hotbox.git 
+ * Copyright (c) 2022 BennoWu; Licensed MIT
+ * ====================================================
+ */
+
+/*!
+ * ====================================================
  * Hot Box UI - v1.0.15 - 2017-05-05
  * https://github.com/fex-team/hotbox
  * GitHub: https://github.com/fex-team/hotbox.git 
@@ -285,6 +293,10 @@ _p[1] = {
             var stateActived = false;
             // 布局，添加按钮后，标记需要布局
             var needLayout = true;
+            var rerender = false;
+            this.rerender = function() {
+                rerender = true;
+            };
             function layout() {
                 var radius = buttons.ring.length * 15;
                 layoutRing(radius);
@@ -399,6 +411,7 @@ _p[1] = {
                     break;
                 }
                 return {
+                    render: option.render,
                     action: option.action,
                     enable: option.enable || alwaysEnable,
                     beforeShow: option.beforeShow,
@@ -412,7 +425,7 @@ _p[1] = {
             // 默认按钮渲染
             function defaultButtonRender(format, option) {
                 return format('<span class="label">{label}</span><span class="key">{key}</span>', {
-                    label: option.label,
+                    label: typeof option.label === "function" ? option.label() : option.label,
                     key: option.key && option.key.split("|")[0]
                 });
             }
@@ -441,10 +454,18 @@ _p[1] = {
                     if ($button) {
                         $button.classList[button.enable() ? "add" : "remove"]("enabled");
                     }
+                    if (rerender) {
+                        var render = button.render || defaultButtonRender;
+                        $button.innerHTML = render(format, {
+                            label: button.label,
+                            key: button.key
+                        });
+                    }
                     if (button.beforeShow) {
                         button.beforeShow();
                     }
                 });
+                rerender = false;
                 addElementClass($state, STATE_ACTIVE_CLASS);
                 if (needLayout) {
                     layout();
